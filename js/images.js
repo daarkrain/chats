@@ -33,4 +33,8 @@ const IMAGES = [
   "image17.jpg",
   "image18.jpg",
   "image6.jpg",
+  "IMG_20240704_162204.JPG",
+  "IMG_20250515_175239.jpg",
+  "IMG_20250515_180411.jpg",
+  "Snapchat-1865031127.jpg",
 ];
