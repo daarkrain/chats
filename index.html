@@ -6,8 +6,13 @@
   <title>Galerie</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { width: 100%; height: 100%; background: #000; overflow: hidden; }
-    img { width: 100vw; height: 100vh; object-fit: contain; display: block; }
+    html, body { width: 100%; height: 100%; background: #000; overflow: hidden; cursor: pointer; }
+    img {
+      width: 100vw; height: 100vh;
+      object-fit: contain; display: block;
+      transition: opacity 0.3s ease;
+    }
+    img.fade { opacity: 0; }
   </style>
 </head>
 <body>
@@ -15,8 +20,45 @@
   <script src="js/images.js"></script>
   <script>
     const pool = IMAGES.filter(f => /\.(jpg|jpeg|png|gif|webp|avif|svg)$/i.test(f));
-    const idx = Math.floor(Math.random() * pool.length);
-    document.getElementById('img').src = 'images/' + pool[idx];
+    let lastIdx = -1;
+ 
+    function pickRandom() {
+      if (pool.length <= 1) return 0;
+      let idx;
+      do { idx = Math.floor(Math.random() * pool.length); } while (idx === lastIdx);
+      lastIdx = idx;
+      return idx;
+    }
+ 
+    function showNext() {
+      const el = document.getElementById('img');
+      el.classList.add('fade');
+      setTimeout(() => {
+        el.src = 'images/' + pool[pickRandom()];
+        el.onload = () => el.classList.remove('fade');
+      }, 300);
+    }
+ 
+    // Chargement initial
+    const el = document.getElementById('img');
+    lastIdx = pickRandom();
+    el.src = 'images/' + pool[lastIdx];
+ 
+    // Clic souris (PC)
+    document.addEventListener('click', showNext);
+ 
+    // Tap smartphone
+    let startX, startY;
+    document.addEventListener('touchstart', e => {
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+    }, { passive: true });
+    document.addEventListener('touchend', e => {
+      const dx = Math.abs(e.changedTouches[0].clientX - startX);
+      const dy = Math.abs(e.changedTouches[0].clientY - startY);
+      if (dx < 10 && dy < 10) showNext(); // tap simple
+    }, { passive: true });
   </script>
 </body>
 </html>
+ 
