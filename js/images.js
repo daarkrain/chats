@@ -5,8 +5,8 @@
 // ============================================================
 
 const IMAGES = [
-  "exemple1.jpg",
-  "exemple2.jpg",
-  "exemple3.jpg",
-  // → Ajoute tes images ici ↑
+  "IMG_20250612_131436.jpg",
+  "Snapchat-149121051.jpg",
+  "IMG_20250718_174315.jpg",
+  "IMG_20251219_090504",
 ];
