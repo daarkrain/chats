@@ -2,63 +2,446 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Galerie</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <title>Cat Distribution System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet"/>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { width: 100%; height: 100%; background: #000; overflow: hidden; cursor: pointer; }
-    img {
-      width: 100vw; height: 100vh;
-      object-fit: contain; display: block;
-      transition: opacity 0.3s ease;
+    :root {
+      --banny: #f4a25a;
+      --flouf: #a78bfa;
+      --bg: #0f0f0f;
+      --surface: #1a1a1a;
+      --border: #2e2e2e;
+      --text: #f5f0e8;
+      --muted: #666;
     }
-    img.fade { opacity: 0; }
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    html, body {
+      width:100%; height:100%;
+      background:var(--bg); color:var(--text);
+      font-family:'Nunito',sans-serif;
+      overflow:hidden;
+      touch-action:manipulation;
+    }
+
+    /* ── WELCOME ── */
+    #welcome {
+      position:fixed; inset:0; z-index:50;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      background:var(--bg);
+      gap:1.2rem;
+      padding:2rem 1.5rem;
+      animation: fadeIn .5s ease;
+    }
+    .logo {
+      font-family:'Fredoka One', cursive;
+      font-size:clamp(1.6rem,7vw,3rem);
+      text-align:center; line-height:1.15;
+    }
+    .logo .cat  { color:var(--banny); }
+    .logo .sys  { color:var(--flouf); }
+    .paw-divider { font-size:1.2rem; opacity:.4; letter-spacing:.3em; }
+    .subtitle {
+      font-size:.85rem; color:var(--muted);
+      text-align:center; max-width:260px; line-height:1.6;
+    }
+    .input-wrap {
+      display:flex; flex-direction:column; align-items:center;
+      gap:.65rem; width:100%; max-width:280px;
+    }
+    .welcome-msg {
+      font-family:'Fredoka One',cursive;
+      font-size:1.1rem; text-align:center; min-height:1.6rem;
+    }
+    #nameInput {
+      width:100%; padding:.8rem 1.1rem;
+      background:var(--surface); border:1.5px solid var(--border);
+      border-radius:50px; color:var(--text);
+      font-family:'Nunito',sans-serif; font-size:1rem;
+      text-align:center; outline:none;
+      transition:border-color .2s; -webkit-appearance:none;
+    }
+    #nameInput:focus { border-color:var(--banny); }
+    #nameInput::placeholder { color:var(--muted); }
+    .btn-enter {
+      width:100%; padding:.8rem;
+      background:var(--banny); color:#1a0a00;
+      border:none; border-radius:50px;
+      font-family:'Fredoka One',cursive; font-size:1.05rem;
+      cursor:pointer; -webkit-appearance:none;
+      transition:transform .15s;
+    }
+    .btn-enter:active { transform:scale(.97); }
+    .btn-skip {
+      background:none; border:none;
+      color:var(--muted); font-family:'Nunito',sans-serif;
+      font-size:.8rem; cursor:pointer;
+      text-decoration:underline; text-underline-offset:3px;
+      padding:.3rem;
+    }
+
+    /* ── GALLERY ── */
+    #gallery {
+      display:none; width:100%; height:100%;
+      position:relative; cursor:pointer;
+      user-select:none; -webkit-user-select:none;
+    }
+    #gallery.active { display:block; }
+
+    #img {
+      width:100vw; height:100vh;
+      object-fit:contain; display:block;
+      transition:opacity .3s ease;
+      pointer-events:none;
+      will-change:transform;
+    }
+    #img.fade { opacity:0; }
+
+    /* ── DISCO OVERLAY ── */
+    #disco {
+      position:fixed; inset:0;
+      pointer-events:none; z-index:5;
+      opacity:0;
+      mix-blend-mode:screen;
+      transition:background .05s, opacity .08s;
+    }
+
+    /* ── HUD ── */
+    #hud {
+      position:fixed;
+      bottom:max(1.2rem, env(safe-area-inset-bottom, 1.2rem));
+      left:50%; transform:translateX(-50%);
+      display:flex; gap:.85rem; align-items:center;
+      background:rgba(15,15,15,.8);
+      backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+      border:1px solid var(--border);
+      border-radius:50px; padding:.45rem 1.1rem;
+      pointer-events:none; z-index:10; white-space:nowrap;
+    }
+    .hud-cat {
+      display:flex; align-items:center; gap:.35rem;
+      font-family:'Fredoka One',cursive; font-size:.82rem;
+    }
+    .dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+    .dot-b { background:var(--banny); box-shadow:0 0 5px var(--banny); }
+    .dot-f { background:var(--flouf); box-shadow:0 0 5px var(--flouf); }
+    .hud-div { width:1px; height:14px; background:var(--border); }
+
+    /* ── TOAST ── */
+    #toast {
+      position:fixed;
+      top:max(1.5rem, env(safe-area-inset-top, 1.5rem));
+      left:50%; transform:translateX(-50%) translateY(-80px);
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:50px; padding:.5rem 1.3rem;
+      font-family:'Fredoka One',cursive; font-size:.95rem;
+      pointer-events:none; z-index:20;
+      transition:transform .4s cubic-bezier(.34,1.56,.64,1), opacity .4s;
+      opacity:0; white-space:nowrap; max-width:90vw; text-align:center;
+    }
+    #toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
+
+    /* ── COMPLETION ── */
+    #completion {
+      display:none; position:fixed; inset:0; z-index:30;
+      background:rgba(0,0,0,.88);
+      backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+      flex-direction:column; align-items:center; justify-content:center;
+      gap:1rem; text-align:center; padding:2rem;
+    }
+    #completion.show { display:flex; animation:fadeIn .5s ease; }
+    #completion .big { font-family:'Fredoka One',cursive; font-size:clamp(1.8rem,5vw,2.8rem); }
+    #completion .sub { color:var(--muted); font-size:.88rem; max-width:260px; line-height:1.6; }
+    .btn-continue {
+      padding:.65rem 1.8rem;
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:50px; color:var(--text);
+      font-family:'Fredoka One',cursive; font-size:1rem; cursor:pointer;
+    }
+
+    @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
   </style>
 </head>
 <body>
-  <img id="img" src="" alt="" />
-  <script src="js/images.js"></script>
-  <script>
-    const pool = IMAGES.filter(f => /\.(jpg|jpeg|png|gif|webp|avif|svg)$/i.test(f));
-    let lastIdx = -1;
- 
-    function pickRandom() {
-      if (pool.length <= 1) return 0;
-      let idx;
-      do { idx = Math.floor(Math.random() * pool.length); } while (idx === lastIdx);
-      lastIdx = idx;
-      return idx;
-    }
- 
-    function showNext() {
-      const el = document.getElementById('img');
-      el.classList.add('fade');
-      setTimeout(() => {
-        el.src = 'images/' + pool[pickRandom()];
-        el.onload = () => el.classList.remove('fade');
-      }, 300);
-    }
- 
-    // Chargement initial
-    const el = document.getElementById('img');
-    lastIdx = pickRandom();
-    el.src = 'images/' + pool[lastIdx];
- 
-    // Clic souris (PC)
-    document.addEventListener('click', showNext);
- 
-    // Tap smartphone
-    let startX, startY;
-    document.addEventListener('touchstart', e => {
-      startX = e.touches[0].clientX;
-      startY = e.touches[0].clientY;
-    }, { passive: true });
-    document.addEventListener('touchend', e => {
-      const dx = Math.abs(e.changedTouches[0].clientX - startX);
-      const dy = Math.abs(e.changedTouches[0].clientY - startY);
-      if (dx < 10 && dy < 10) showNext(); // tap simple
-    }, { passive: true });
-  </script>
+
+<div id="welcome">
+  <div class="logo">
+    <span class="cat">Cat</span> <span>Distribution</span><br><span class="sys">System</span>
+  </div>
+  <div class="paw-divider">🐾 🐾 🐾</div>
+  <p class="subtitle">Entre ton prénom pour garder ta progression</p>
+  <div class="input-wrap">
+    <div class="welcome-msg" id="welcomeMsg"></div>
+    <input id="nameInput" type="text" placeholder="Ton prénom..." maxlength="30"
+           autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false"/>
+    <button class="btn-enter" id="btnEnter">Entrer</button>
+    <button class="btn-skip" id="btnSkip">Non meowrsi</button>
+  </div>
+</div>
+
+<div id="gallery">
+  <img id="img" src="" alt=""/>
+  <div id="disco"></div>
+  <div id="hud">
+    <div class="hud-cat"><div class="dot dot-b"></div><span id="hudBanny">Banny 0/40</span></div>
+    <div class="hud-div"></div>
+    <div class="hud-cat"><div class="dot dot-f"></div><span id="hudFlouf">Flouf 0/10</span></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+<div id="completion">
+  <div class="big" id="completionTitle"></div>
+  <div class="sub" id="completionSub"></div>
+  <button class="btn-continue" onclick="closeCompletion()">Continuer à regarder</button>
+</div>
+
+<script>
+// ── DATA ─────────────────────────────────────────────────────
+const IMAGES = [
+  "IMG_20250612_131436.jpg","IMG_20250718_174315.jpg","IMG_20251219_090504.jpg",
+  "Image10.jpg","Image13.jpg","Image14.jpg","Image15.jpg","Image19.jpg","Image20.jpg",
+  "Image21.jpg","Image22.jpg","Image23.jpg","Image24.jpg","Image25.jpg","Image26.jpg",
+  "Image27.jpg","Image2.webp","Image3.jpg","Image4.jpg","Image5.jpg","Image7.jpg","Image9.jpg",
+  "Snapchat-149121051.jpg","WhatsApp Image 2026-05-28 at 15.37.43.jpeg",
+  "image1.jpg","image17.jpg","image18.jpg","image6.jpg",
+  "IMG_20240704_162204.JPG","IMG_20250515_175239.jpg","IMG_20250515_180411.jpg","Snapchat-1865031127.jpg",
+  "1.jpg","2.jpg","3.jpg","4.jpg","5.jpg","6.jpg","7.jpg","8.jpg","9.jpg","10.jpg",
+  "11.jpg","12.jpg","13.jpg","14.jpg","15.jpg","16.jpg","17.jpg","18.jpg","19.jpg","20.jpg",
+  "21.jpg","22.jpg","23.jpg","24.jpg","25.jpg","26.jpg","27.jpg","28.jpg","29.jpg","30.jpg",
+  "31.jpg","32.jpg","33.jpg","34.jpg","35.jpg","36.jpg","37.jpg","38.jpg","39.jpg","40.jpg"
+];
+
+const BANNY_IMAGES = new Set([
+  "IMG_20250612_131436.jpg","IMG_20250718_174315.jpg","IMG_20251219_090504.jpg",
+  "Snapchat-149121051.jpg","IMG_20240704_162204.JPG","IMG_20250515_175239.jpg",
+  "IMG_20250515_180411.jpg","Snapchat-1865031127.jpg",
+  "1.jpg","2.jpg","3.jpg","4.jpg","5.jpg","6.jpg","7.jpg","8.jpg","9.jpg","10.jpg",
+  "11.jpg","12.jpg","13.jpg","14.jpg","15.jpg","16.jpg","17.jpg","18.jpg","19.jpg","20.jpg",
+  "21.jpg","22.jpg","23.jpg","24.jpg","25.jpg","26.jpg","27.jpg","28.jpg","29.jpg","30.jpg",
+  "31.jpg","32.jpg","33.jpg","34.jpg","35.jpg","36.jpg","37.jpg","38.jpg","39.jpg","40.jpg"
+]);
+const FLOUF_IMAGES = new Set(IMAGES.filter(f => !BANNY_IMAGES.has(f)));
+const BANNY_TOTAL = BANNY_IMAGES.size;
+const FLOUF_TOTAL = FLOUF_IMAGES.size;
+
+const BANNY_NAMES = new Set(["nadir","samy","rym","nora","fatsah","rafik"]);
+const FLOUF_NAMES = new Set(["nelia"]);
+const RANDOM_WELCOMES = [
+  "Bienvenue, mystérieux humain 👀",
+  "Encore un humain qui regarde des chats...",
+  "Tu es des nôtres maintenant 🐾",
+  "Bienvenue dans le terrier à chats 🕳️",
+  "On t'attendait. Enfin presque.",
+];
+
+const DISCO_COLORS = [
+  "255,50,50","255,120,0","255,220,0","50,255,80",
+  "0,200,255","80,80,255","200,0,255","255,0,180",
+  "0,255,200","255,255,0","255,0,100","100,255,0"
+];
+
+// ── STATE ─────────────────────────────────────────────────────
+let saveEnabled=false, userName=null;
+let seenImages=new Set(), seenBanny=new Set(), seenFlouf=new Set();
+let lastIdx=-1;
+const pool = IMAGES.filter(f=>/\.(jpg|jpeg|png|gif|webp|avif|svg)$/i.test(f));
+
+// ── STORAGE ───────────────────────────────────────────────────
+function storageKey(){ return 'cds_'+userName.toLowerCase().trim(); }
+function saveProgress(){
+  if(!saveEnabled) return;
+  localStorage.setItem(storageKey(), JSON.stringify({
+    seenImages:[...seenImages], seenBanny:[...seenBanny], seenFlouf:[...seenFlouf]
+  }));
+}
+function loadProgress(){
+  if(!saveEnabled) return;
+  try {
+    const d=JSON.parse(localStorage.getItem(storageKey())||'null');
+    if(!d) return;
+    seenImages=new Set(d.seenImages||[]);
+    seenBanny =new Set(d.seenBanny||[]);
+    seenFlouf =new Set(d.seenFlouf||[]);
+  } catch(e){}
+}
+
+// ── WELCOME ───────────────────────────────────────────────────
+const nameInput  = document.getElementById('nameInput');
+const welcomeMsg = document.getElementById('welcomeMsg');
+
+nameInput.addEventListener('input', ()=>{
+  const v=nameInput.value.trim().toLowerCase();
+  if(!v){ welcomeMsg.textContent=''; return; }
+  if(BANNY_NAMES.has(v))      welcomeMsg.innerHTML=`<span style="color:var(--banny)">Serviteur de Banny 🟠</span>`;
+  else if(FLOUF_NAMES.has(v)) welcomeMsg.innerHTML=`<span style="color:var(--flouf)">Serviteure de Flouf 🟣</span>`;
+  else welcomeMsg.textContent='';
+});
+nameInput.addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('btnEnter').click(); });
+
+document.getElementById('btnEnter').addEventListener('click', ()=>{
+  const name=nameInput.value.trim();
+  if(!name){ nameInput.focus(); return; }
+  userName=name; saveEnabled=true; loadProgress();
+  const v=name.toLowerCase();
+  let msg;
+  if(BANNY_NAMES.has(v))      msg=`Bienvenue serviteur de Banny 🐾`;
+  else if(FLOUF_NAMES.has(v)) msg=`Bienvenue serviteure de Flouf 💜`;
+  else msg=RANDOM_WELCOMES[Math.floor(Math.random()*RANDOM_WELCOMES.length)];
+  startGallery(msg);
+});
+document.getElementById('btnSkip').addEventListener('click', ()=>{
+  saveEnabled=false; userName=null; startGallery(null);
+});
+
+// ── AUDIO + DISCO ─────────────────────────────────────────────
+let audioCtx=null, analyser=null, dataArray=null, audioSource=null;
+let discoRunning=false;
+let lastBeat=0, lastColorIdx=0;
+let currentBeatScale=1;
+const disco = document.getElementById('disco');
+const imgEl  = document.getElementById('img');
+
+function initAudio(){
+  const audio = new Audio('intro.mp3');
+  audio.loop = true;
+  audio.volume = 0.7;
+
+  audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  analyser = audioCtx.createAnalyser();
+  analyser.fftSize = 256;
+  analyser.smoothingTimeConstant = 0.75;
+
+  const source = audioCtx.createMediaElementSource(audio);
+  source.connect(analyser);
+  analyser.connect(audioCtx.destination);
+
+  dataArray = new Uint8Array(analyser.frequencyBinCount);
+  audio.play().catch(()=>{});
+  discoRunning = true;
+  discoBeat();
+}
+
+function discoBeat(){
+  if(!discoRunning) return;
+  requestAnimationFrame(discoBeat);
+
+  analyser.getByteFrequencyData(dataArray);
+
+  // Moyenne des basses fréquences (kick / beat)
+  const bassEnd = Math.floor(dataArray.length * 0.08);
+  let bassSum = 0;
+  for(let i=0;i<bassEnd;i++) bassSum += dataArray[i];
+  const bassAvg = bassSum / bassEnd;
+
+  const now = performance.now();
+  const isBeat = bassAvg > 140 && (now - lastBeat) > 200;
+
+  if(isBeat){
+    lastBeat = now;
+    // Nouvelle couleur disco à chaque beat
+    lastColorIdx = (lastColorIdx + 1 + Math.floor(Math.random()*3)) % DISCO_COLORS.length;
+    const col = DISCO_COLORS[lastColorIdx];
+    disco.style.background = `rgba(${col}, 0.22)`;
+    disco.style.opacity = '1';
+
+    // Vibration de l'image
+    currentBeatScale = 1.018;
+    imgEl.style.transform = `scale(${currentBeatScale})`;
+
+    // Vibration physique sur mobile
+    if(navigator.vibrate) navigator.vibrate(40);
+
+    // Retour rapide
+    setTimeout(()=>{
+      disco.style.opacity = '0';
+      imgEl.style.transform = 'scale(1)';
+      currentBeatScale = 1;
+    }, 160);
+  }
+}
+
+// ── GALLERY ───────────────────────────────────────────────────
+function startGallery(msg){
+  document.getElementById('welcome').style.display='none';
+  document.getElementById('gallery').classList.add('active');
+  updateHUD();
+  initAudio();
+  if(msg) showToast(msg, 3000);
+  showNext(true);
+}
+
+function pickRandom(){
+  if(pool.length<=1) return 0;
+  let idx;
+  do { idx=Math.floor(Math.random()*pool.length); } while(idx===lastIdx);
+  lastIdx=idx;
+  return idx;
+}
+
+function showNext(instant){
+  const el=document.getElementById('img');
+  if(!instant) el.classList.add('fade');
+  setTimeout(()=>{
+    const file=pool[pickRandom()];
+    el.src='images/'+file;
+    el.onload=()=>{ el.classList.remove('fade'); recordSeen(file); };
+  }, instant?0:300);
+}
+
+function recordSeen(file){
+  if(seenImages.has(file)) return;
+  seenImages.add(file);
+  if(BANNY_IMAGES.has(file)&&!seenBanny.has(file)) seenBanny.add(file);
+  else if(FLOUF_IMAGES.has(file)&&!seenFlouf.has(file)) seenFlouf.add(file);
+  updateHUD(); saveProgress();
+  if(seenBanny.size===BANNY_TOTAL) setTimeout(()=>showCompletion('banny'),600);
+  else if(seenFlouf.size===FLOUF_TOTAL) setTimeout(()=>showCompletion('flouf'),600);
+}
+
+function updateHUD(){
+  document.getElementById('hudBanny').textContent=`Banny ${seenBanny.size}/${BANNY_TOTAL}`;
+  document.getElementById('hudFlouf').textContent=`Flouf ${seenFlouf.size}/${FLOUF_TOTAL}`;
+}
+
+function showCompletion(cat){
+  const t=document.getElementById('completionTitle');
+  const s=document.getElementById('completionSub');
+  if(cat==='banny'){
+    t.innerHTML=`<span style="color:var(--banny)">Banny collecté ! 🎊</span>`;
+    s.textContent=`Tu as vu toutes les photos de Banny. Mission accomplie, serviteur.`;
+  } else {
+    t.innerHTML=`<span style="color:var(--flouf)">Flouf collecté ! 🎊</span>`;
+    s.textContent=`Tu as vu toutes les photos de Flouf. Flouf est fier de toi.`;
+  }
+  document.getElementById('completion').classList.add('show');
+}
+function closeCompletion(){ document.getElementById('completion').classList.remove('show'); }
+
+let toastTimer;
+function showToast(msg,duration=2000){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),duration);
+}
+
+// ── INTERACTIONS ──────────────────────────────────────────────
+document.getElementById('gallery').addEventListener('click',()=>showNext(false));
+
+let startX,startY;
+document.addEventListener('touchstart',e=>{ startX=e.touches[0].clientX; startY=e.touches[0].clientY; },{passive:true});
+document.addEventListener('touchend',e=>{
+  const dx=Math.abs(e.changedTouches[0].clientX-startX);
+  const dy=Math.abs(e.changedTouches[0].clientY-startY);
+  if(dx<10&&dy<10) showNext(false);
+},{passive:true});
+
+document.addEventListener('keydown',e=>{
+  if(e.code==='Space'||e.code==='ArrowRight'){e.preventDefault();showNext(false);}
+});
+</script>
 </body>
 </html>
- 
