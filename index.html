@@ -284,9 +284,9 @@ let lastBeat=0, lastColorIdx=0;
 const disco = document.getElementById('disco');
 const imgEl  = document.getElementById('img');
 
-const BEAT_COOLDOWN = 900;
-const SCALE_BIG  = 1.10;   // zoom max au beat
-const SCALE_SMALL = 1.0;   // retour à la normale
+const BEAT_COOLDOWN = 850;
+const SCALE_BIG  = 1.13;
+const SCALE_SMALL = 1.0;
 
 // On anime scale en JS avec requestAnimationFrame pour avoir un contrôle total
 let currentScale = 1.0;
@@ -298,12 +298,18 @@ let zoomOutTimer = null;
 function animateScale(){
   if(!animating) return;
   const diff = targetScale - currentScale;
-  if(Math.abs(diff) < 0.0005){
+  if(Math.abs(diff) < 0.0003){
     currentScale = targetScale;
     imgEl.style.transform = `scale(${currentScale})`;
     if(targetScale === SCALE_SMALL) animating = false;
     return;
   }
+  // Rapide vers target, lent vers le bas — effet bounce
+  const speed = currentScale > targetScale ? 0.12 : 0.22;
+  currentScale += diff * speed;
+  imgEl.style.transform = `scale(${currentScale})`;
+  requestAnimationFrame(animateScale);
+}
   // Ease : rapide vers le haut, lent vers le bas
   const speed = targetScale > currentScale ? 0.18 : 0.03;
   currentScale += diff * speed;
@@ -316,29 +322,24 @@ function triggerBeat(){
   if(lastBeat > 0) beatPeriod = now - lastBeat;
   lastBeat = now;
 
-  // Couleur disco — change à chaque beat, synchronisé
   lastColorIdx = (lastColorIdx + 1 + Math.floor(Math.random()*3)) % DISCO_COLORS.length;
   const col = DISCO_COLORS[lastColorIdx];
-
-  // Flash immédiat de la couleur
   disco.style.transition = 'none';
   disco.style.background = `rgba(${col}, 0.30)`;
   disco.style.opacity = '1';
-
-  // Fade out de la couleur sur ~300ms
   setTimeout(()=>{
-    disco.style.transition = 'opacity 0.35s ease';
+    disco.style.transition = 'opacity 0.3s ease';
     disco.style.opacity = '0';
   }, 20);
 
-  // Zoom IN instantané au beat
+  // Bounce : zoom IN instantané puis petit overshoot
   clearTimeout(zoomOutTimer);
-  targetScale = SCALE_BIG;
+  currentScale = SCALE_BIG + 0.04; // overshoot
+  targetScale  = SCALE_BIG;
   animating = true;
   animateScale();
 
-  // Zoom OUT lent — démarre 100ms avant le prochain beat estimé
-  const outDelay = Math.max(beatPeriod * 0.65, 400);
+  const outDelay = Math.max(beatPeriod * 0.6, 380);
   zoomOutTimer = setTimeout(()=>{
     targetScale = SCALE_SMALL;
     animating = true;
