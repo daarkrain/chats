@@ -22,17 +22,14 @@
       width:100%; height:100%;
       background:var(--bg); color:var(--text);
       font-family:'Nunito',sans-serif;
-      overflow:hidden;
-      touch-action:manipulation;
+      overflow:hidden; touch-action:manipulation;
     }
 
     /* ── WELCOME ── */
     #welcome {
       position:fixed; inset:0; z-index:50;
       display:flex; flex-direction:column; align-items:center; justify-content:center;
-      background:var(--bg);
-      gap:1.2rem;
-      padding:2rem 1.5rem;
+      background:var(--bg); gap:1.2rem; padding:2rem 1.5rem;
       animation: fadeIn .5s ease;
     }
     .logo {
@@ -40,90 +37,62 @@
       font-size:clamp(1.6rem,7vw,3rem);
       text-align:center; line-height:1.15;
     }
-    .logo .cat  { color:var(--banny); }
-    .logo .sys  { color:var(--flouf); }
+    .logo .cat { color:var(--banny); }
+    .logo .sys { color:var(--flouf); }
     .paw-divider { font-size:1.2rem; opacity:.4; letter-spacing:.3em; }
-    .subtitle {
-      font-size:.85rem; color:var(--muted);
-      text-align:center; max-width:260px; line-height:1.6;
-    }
-    .input-wrap {
-      display:flex; flex-direction:column; align-items:center;
-      gap:.65rem; width:100%; max-width:280px;
-    }
-    .welcome-msg {
-      font-family:'Fredoka One',cursive;
-      font-size:1.1rem; text-align:center; min-height:1.6rem;
-    }
+    .subtitle { font-size:.85rem; color:var(--muted); text-align:center; max-width:260px; line-height:1.6; }
+    .input-wrap { display:flex; flex-direction:column; align-items:center; gap:.65rem; width:100%; max-width:280px; }
+    .welcome-msg { font-family:'Fredoka One',cursive; font-size:1.1rem; text-align:center; min-height:1.6rem; }
     #nameInput {
       width:100%; padding:.8rem 1.1rem;
       background:var(--surface); border:1.5px solid var(--border);
       border-radius:50px; color:var(--text);
       font-family:'Nunito',sans-serif; font-size:1rem;
-      text-align:center; outline:none;
-      transition:border-color .2s; -webkit-appearance:none;
+      text-align:center; outline:none; transition:border-color .2s; -webkit-appearance:none;
     }
     #nameInput:focus { border-color:var(--banny); }
     #nameInput::placeholder { color:var(--muted); }
     .btn-enter {
-      width:100%; padding:.8rem;
-      background:var(--banny); color:#1a0a00;
-      border:none; border-radius:50px;
-      font-family:'Fredoka One',cursive; font-size:1.05rem;
-      cursor:pointer; -webkit-appearance:none;
-      transition:transform .15s;
+      width:100%; padding:.8rem; background:var(--banny); color:#1a0a00;
+      border:none; border-radius:50px; font-family:'Fredoka One',cursive;
+      font-size:1.05rem; cursor:pointer; -webkit-appearance:none; transition:transform .15s;
     }
     .btn-enter:active { transform:scale(.97); }
     .btn-skip {
-      background:none; border:none;
-      color:var(--muted); font-family:'Nunito',sans-serif;
-      font-size:.8rem; cursor:pointer;
-      text-decoration:underline; text-underline-offset:3px;
-      padding:.3rem;
+      background:none; border:none; color:var(--muted);
+      font-family:'Nunito',sans-serif; font-size:.8rem; cursor:pointer;
+      text-decoration:underline; text-underline-offset:3px; padding:.3rem;
     }
 
     /* ── GALLERY ── */
-    #gallery {
-      display:none; width:100%; height:100%;
-      position:relative; cursor:pointer;
-      user-select:none; -webkit-user-select:none;
-    }
+    #gallery { display:none; width:100%; height:100%; position:relative; cursor:pointer; user-select:none; -webkit-user-select:none; }
     #gallery.active { display:block; }
 
     #img {
-      width:100vw; height:100vh;
-      object-fit:contain; display:block;
-      transition:opacity .3s ease;
-      pointer-events:none;
-      will-change:transform;
+      width:100vw; height:100vh; object-fit:contain; display:block;
+      transition:opacity .3s ease, transform .6s cubic-bezier(.23,1.2,.32,1);
+      pointer-events:none; will-change:transform;
+      transform-origin:center center;
     }
     #img.fade { opacity:0; }
 
     /* ── DISCO OVERLAY ── */
     #disco {
-      position:fixed; inset:0;
-      pointer-events:none; z-index:5;
-      opacity:0;
-      mix-blend-mode:screen;
-      transition:background .05s, opacity .08s;
+      position:fixed; inset:0; pointer-events:none; z-index:5;
+      opacity:0; mix-blend-mode:screen;
+      transition:opacity .5s ease;
     }
 
     /* ── HUD ── */
     #hud {
-      position:fixed;
-      bottom:max(1.2rem, env(safe-area-inset-bottom, 1.2rem));
+      position:fixed; bottom:max(1.2rem, env(safe-area-inset-bottom, 1.2rem));
       left:50%; transform:translateX(-50%);
       display:flex; gap:.85rem; align-items:center;
-      background:rgba(15,15,15,.8);
-      backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
-      border:1px solid var(--border);
-      border-radius:50px; padding:.45rem 1.1rem;
-      pointer-events:none; z-index:10; white-space:nowrap;
+      background:rgba(15,15,15,.8); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+      border:1px solid var(--border); border-radius:50px;
+      padding:.45rem 1.1rem; pointer-events:none; z-index:10; white-space:nowrap;
     }
-    .hud-cat {
-      display:flex; align-items:center; gap:.35rem;
-      font-family:'Fredoka One',cursive; font-size:.82rem;
-    }
+    .hud-cat { display:flex; align-items:center; gap:.35rem; font-family:'Fredoka One',cursive; font-size:.82rem; }
     .dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
     .dot-b { background:var(--banny); box-shadow:0 0 5px var(--banny); }
     .dot-f { background:var(--flouf); box-shadow:0 0 5px var(--flouf); }
@@ -131,8 +100,7 @@
 
     /* ── TOAST ── */
     #toast {
-      position:fixed;
-      top:max(1.5rem, env(safe-area-inset-top, 1.5rem));
+      position:fixed; top:max(1.5rem, env(safe-area-inset-top, 1.5rem));
       left:50%; transform:translateX(-50%) translateY(-80px);
       background:var(--surface); border:1px solid var(--border);
       border-radius:50px; padding:.5rem 1.3rem;
@@ -146,8 +114,7 @@
     /* ── COMPLETION ── */
     #completion {
       display:none; position:fixed; inset:0; z-index:30;
-      background:rgba(0,0,0,.88);
-      backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+      background:rgba(0,0,0,.88); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
       flex-direction:column; align-items:center; justify-content:center;
       gap:1rem; text-align:center; padding:2rem;
     }
@@ -155,10 +122,8 @@
     #completion .big { font-family:'Fredoka One',cursive; font-size:clamp(1.8rem,5vw,2.8rem); }
     #completion .sub { color:var(--muted); font-size:.88rem; max-width:260px; line-height:1.6; }
     .btn-continue {
-      padding:.65rem 1.8rem;
-      background:var(--surface); border:1px solid var(--border);
-      border-radius:50px; color:var(--text);
-      font-family:'Fredoka One',cursive; font-size:1rem; cursor:pointer;
+      padding:.65rem 1.8rem; background:var(--surface); border:1px solid var(--border);
+      border-radius:50px; color:var(--text); font-family:'Fredoka One',cursive; font-size:1rem; cursor:pointer;
     }
 
     @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
@@ -199,7 +164,7 @@
 </div>
 
 <script>
-// ── DATA ─────────────────────────────────────────────────────
+// ── DATA ──────────────────────────────────────────────────────
 const IMAGES = [
   "IMG_20250612_131436.jpg","IMG_20250718_174315.jpg","IMG_20251219_090504.jpg",
   "Image10.jpg","Image13.jpg","Image14.jpg","Image15.jpg","Image19.jpg","Image20.jpg",
@@ -213,7 +178,6 @@ const IMAGES = [
   "21.jpg","22.jpg","23.jpg","24.jpg","25.jpg","26.jpg","27.jpg","28.jpg","29.jpg","30.jpg",
   "31.jpg","32.jpg","33.jpg","34.jpg","35.jpg","36.jpg","37.jpg","38.jpg","39.jpg","40.jpg"
 ];
-
 const BANNY_IMAGES = new Set([
   "IMG_20250612_131436.jpg","IMG_20250718_174315.jpg","IMG_20251219_090504.jpg",
   "Snapchat-149121051.jpg","IMG_20240704_162204.JPG","IMG_20250515_175239.jpg",
@@ -229,18 +193,43 @@ const FLOUF_TOTAL = FLOUF_IMAGES.size;
 
 const BANNY_NAMES = new Set(["nadir","samy","rym","nora","fatsah","rafik"]);
 const FLOUF_NAMES = new Set(["nelia"]);
-const RANDOM_WELCOMES = [
-  "Bienvenue, mystérieux humain 👀",
-  "Encore un humain qui regarde des chats...",
-  "Tu es des nôtres maintenant 🐾",
-  "Bienvenue dans le terrier à chats 🕳️",
-  "On t'attendait. Enfin presque.",
+
+// ── MESSAGES D'ENTRÉE ─────────────────────────────────────────
+const ENTRY_MSGS_BANNY = [
+  "Bienvenue serviteur de Banny 🐾",
+  "Banny t'a choisi. Tu n'avais pas vraiment le choix.",
+  "Encore toi ? Banny approve.",
+  "Banny ronronne en ton honneur 🟠",
+  "Serviteur fidèle détecté. Banny est satisfait.",
+  "Le maître orange t'accueille 👑",
+];
+const ENTRY_MSGS_FLOUF = [
+  "Bienvenue serviteure de Flouf 💜",
+  "Flouf t'observait depuis le début.",
+  "Mugiwara no Fluffyy 🏴‍☠️",
+  "Flouf a daigné te laisser entrer.",
+  "La royauté violette te salue 🟣",
+  "Flouf ronronne... ou grogne. Difficile à dire.",
+];
+const ENTRY_MSGS_RANDOM = [
+  "Oh encore un humain...",
+  "Qui ose déranger ma sieste ? 😾",
+  "Oh un humain... intéressant.",
+  "Tu as été sélectionné par le Cat Distribution System.",
+  "Bienvenue, étranger. Les chats te surveillent.",
+  "Encore un bipède. Soupir.",
+  "*te regarde fixement sans ciller*",
+  "Tu sens le chien. Mais entre quand même.",
+  "Le CDS a traité ta demande. Sous réserve.",
+  "Hmm. Acceptable. Pour l'instant. 🐱",
+  "Un humain de plus. Statistiquement inévitable.",
+  "Bannyyyyyyyy 🟠🟠🟠",
 ];
 
 const DISCO_COLORS = [
   "255,50,50","255,120,0","255,220,0","50,255,80",
   "0,200,255","80,80,255","200,0,255","255,0,180",
-  "0,255,200","255,255,0","255,0,100","100,255,0"
+  "0,255,200","255,255,50","255,0,100","100,255,0"
 ];
 
 // ── STATE ─────────────────────────────────────────────────────
@@ -262,9 +251,7 @@ function loadProgress(){
   try {
     const d=JSON.parse(localStorage.getItem(storageKey())||'null');
     if(!d) return;
-    seenImages=new Set(d.seenImages||[]);
-    seenBanny =new Set(d.seenBanny||[]);
-    seenFlouf =new Set(d.seenFlouf||[]);
+    seenImages=new Set(d.seenImages||[]); seenBanny=new Set(d.seenBanny||[]); seenFlouf=new Set(d.seenFlouf||[]);
   } catch(e){}
 }
 
@@ -286,80 +273,92 @@ document.getElementById('btnEnter').addEventListener('click', ()=>{
   if(!name){ nameInput.focus(); return; }
   userName=name; saveEnabled=true; loadProgress();
   const v=name.toLowerCase();
-  let msg;
-  if(BANNY_NAMES.has(v))      msg=`Bienvenue serviteur de Banny 🐾`;
-  else if(FLOUF_NAMES.has(v)) msg=`Bienvenue serviteure de Flouf 💜`;
-  else msg=RANDOM_WELCOMES[Math.floor(Math.random()*RANDOM_WELCOMES.length)];
+  let pool_msg;
+  if(BANNY_NAMES.has(v))      pool_msg=ENTRY_MSGS_BANNY;
+  else if(FLOUF_NAMES.has(v)) pool_msg=ENTRY_MSGS_FLOUF;
+  else                         pool_msg=ENTRY_MSGS_RANDOM;
+  // Choisir un message différent du dernier pour ce user
+  const lastKey = 'cds_lastmsg_'+v;
+  const last = localStorage.getItem(lastKey)||'';
+  let candidates = pool_msg.filter(m=>m!==last);
+  if(!candidates.length) candidates=pool_msg;
+  const msg = candidates[Math.floor(Math.random()*candidates.length)];
+  if(saveEnabled) localStorage.setItem(lastKey, msg);
   startGallery(msg);
 });
 document.getElementById('btnSkip').addEventListener('click', ()=>{
-  saveEnabled=false; userName=null; startGallery(null);
+  saveEnabled=false; userName=null;
+  const msg = ENTRY_MSGS_RANDOM[Math.floor(Math.random()*ENTRY_MSGS_RANDOM.length)];
+  startGallery(msg);
 });
 
 // ── AUDIO + DISCO ─────────────────────────────────────────────
-let audioCtx=null, analyser=null, dataArray=null, audioSource=null;
+let audioCtx=null, analyser=null, dataArray=null;
 let discoRunning=false;
 let lastBeat=0, lastColorIdx=0;
-let currentBeatScale=1;
-const disco = document.getElementById('disco');
+const disco  = document.getElementById('disco');
 const imgEl  = document.getElementById('img');
+
+// Beat toutes les ~1s minimum
+const BEAT_COOLDOWN = 950;
+// Durée du pulse : toute la période jusqu'au prochain beat
+let beatInterval = 1000;
+let pulsing = false;
 
 function initAudio(){
   const audio = new Audio('intro.mp3');
-  audio.loop = true;
-  audio.volume = 0.7;
-
+  audio.loop=true; audio.volume=0.7;
   audioCtx = new (window.AudioContext||window.webkitAudioContext)();
   analyser = audioCtx.createAnalyser();
-  analyser.fftSize = 256;
-  analyser.smoothingTimeConstant = 0.75;
-
-  const source = audioCtx.createMediaElementSource(audio);
-  source.connect(analyser);
-  analyser.connect(audioCtx.destination);
-
-  dataArray = new Uint8Array(analyser.frequencyBinCount);
+  analyser.fftSize=256; analyser.smoothingTimeConstant=0.78;
+  const source=audioCtx.createMediaElementSource(audio);
+  source.connect(analyser); analyser.connect(audioCtx.destination);
+  dataArray=new Uint8Array(analyser.frequencyBinCount);
   audio.play().catch(()=>{});
-  discoRunning = true;
+  discoRunning=true;
   discoBeat();
+}
+
+function triggerBeat(){
+  const now = performance.now();
+  beatInterval = now - lastBeat; // mesure l'intervalle réel
+  lastBeat = now;
+
+  // Couleur disco
+  lastColorIdx=(lastColorIdx+1+Math.floor(Math.random()*4))%DISCO_COLORS.length;
+  const col=DISCO_COLORS[lastColorIdx];
+  disco.style.background=`rgba(${col},0.28)`;
+  disco.style.opacity='1';
+
+  // Pulse de l'image : monte vite, reste grand, redescend juste avant le prochain beat
+  imgEl.style.transition='transform 0.12s cubic-bezier(.23,1.2,.32,1)';
+  imgEl.style.transform='scale(1.055)';
+
+  // Vibration mobile
+  if(navigator.vibrate) navigator.vibrate(35);
+
+  // Fade disco après 200ms
+  setTimeout(()=>{ disco.style.opacity='0'; }, 200);
+
+  // Retour à 1 juste avant le prochain beat estimé (80ms avant)
+  const returnDelay = Math.max(beatInterval - 80, 300);
+  setTimeout(()=>{
+    imgEl.style.transition='transform 0.25s ease-in';
+    imgEl.style.transform='scale(1)';
+  }, returnDelay);
 }
 
 function discoBeat(){
   if(!discoRunning) return;
   requestAnimationFrame(discoBeat);
-
   analyser.getByteFrequencyData(dataArray);
-
-  // Moyenne des basses fréquences (kick / beat)
-  const bassEnd = Math.floor(dataArray.length * 0.08);
-  let bassSum = 0;
-  for(let i=0;i<bassEnd;i++) bassSum += dataArray[i];
-  const bassAvg = bassSum / bassEnd;
-
-  const now = performance.now();
-  const isBeat = bassAvg > 140 && (now - lastBeat) > 200;
-
-  if(isBeat){
-    lastBeat = now;
-    // Nouvelle couleur disco à chaque beat
-    lastColorIdx = (lastColorIdx + 1 + Math.floor(Math.random()*3)) % DISCO_COLORS.length;
-    const col = DISCO_COLORS[lastColorIdx];
-    disco.style.background = `rgba(${col}, 0.22)`;
-    disco.style.opacity = '1';
-
-    // Vibration de l'image
-    currentBeatScale = 1.018;
-    imgEl.style.transform = `scale(${currentBeatScale})`;
-
-    // Vibration physique sur mobile
-    if(navigator.vibrate) navigator.vibrate(40);
-
-    // Retour rapide
-    setTimeout(()=>{
-      disco.style.opacity = '0';
-      imgEl.style.transform = 'scale(1)';
-      currentBeatScale = 1;
-    }, 160);
+  const bassEnd=Math.floor(dataArray.length*0.08);
+  let bassSum=0;
+  for(let i=0;i<bassEnd;i++) bassSum+=dataArray[i];
+  const bassAvg=bassSum/bassEnd;
+  const now=performance.now();
+  if(bassAvg>135 && (now-lastBeat)>BEAT_COOLDOWN){
+    triggerBeat();
   }
 }
 
@@ -367,9 +366,8 @@ function discoBeat(){
 function startGallery(msg){
   document.getElementById('welcome').style.display='none';
   document.getElementById('gallery').classList.add('active');
-  updateHUD();
-  initAudio();
-  if(msg) showToast(msg, 3000);
+  updateHUD(); initAudio();
+  if(msg) showToast(msg, 3500);
   showNext(true);
 }
 
@@ -377,8 +375,7 @@ function pickRandom(){
   if(pool.length<=1) return 0;
   let idx;
   do { idx=Math.floor(Math.random()*pool.length); } while(idx===lastIdx);
-  lastIdx=idx;
-  return idx;
+  lastIdx=idx; return idx;
 }
 
 function showNext(instant){
@@ -407,8 +404,7 @@ function updateHUD(){
 }
 
 function showCompletion(cat){
-  const t=document.getElementById('completionTitle');
-  const s=document.getElementById('completionSub');
+  const t=document.getElementById('completionTitle'), s=document.getElementById('completionSub');
   if(cat==='banny'){
     t.innerHTML=`<span style="color:var(--banny)">Banny collecté ! 🎊</span>`;
     s.textContent=`Tu as vu toutes les photos de Banny. Mission accomplie, serviteur.`;
@@ -430,7 +426,6 @@ function showToast(msg,duration=2000){
 
 // ── INTERACTIONS ──────────────────────────────────────────────
 document.getElementById('gallery').addEventListener('click',()=>showNext(false));
-
 let startX,startY;
 document.addEventListener('touchstart',e=>{ startX=e.touches[0].clientX; startY=e.touches[0].clientY; },{passive:true});
 document.addEventListener('touchend',e=>{
@@ -438,7 +433,6 @@ document.addEventListener('touchend',e=>{
   const dy=Math.abs(e.changedTouches[0].clientY-startY);
   if(dx<10&&dy<10) showNext(false);
 },{passive:true});
-
 document.addEventListener('keydown',e=>{
   if(e.code==='Space'||e.code==='ArrowRight'){e.preventDefault();showNext(false);}
 });
