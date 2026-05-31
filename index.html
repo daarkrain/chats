@@ -25,18 +25,13 @@
       overflow:hidden; touch-action:manipulation;
     }
 
-    /* ── WELCOME ── */
     #welcome {
       position:fixed; inset:0; z-index:50;
       display:flex; flex-direction:column; align-items:center; justify-content:center;
       background:var(--bg); gap:1.2rem; padding:2rem 1.5rem;
       animation: fadeIn .5s ease;
     }
-    .logo {
-      font-family:'Fredoka One', cursive;
-      font-size:clamp(1.6rem,7vw,3rem);
-      text-align:center; line-height:1.15;
-    }
+    .logo { font-family:'Fredoka One', cursive; font-size:clamp(1.6rem,7vw,3rem); text-align:center; line-height:1.15; }
     .logo .cat { color:var(--banny); }
     .logo .sys { color:var(--flouf); }
     .paw-divider { font-size:1.2rem; opacity:.4; letter-spacing:.3em; }
@@ -64,26 +59,22 @@
       text-decoration:underline; text-underline-offset:3px; padding:.3rem;
     }
 
-    /* ── GALLERY ── */
-    #gallery { display:none; width:100%; height:100%; position:relative; cursor:pointer; user-select:none; -webkit-user-select:none; }
+    #gallery { display:none; width:100%; height:100%; position:relative; cursor:pointer; user-select:none; -webkit-user-select:none; overflow:hidden; }
     #gallery.active { display:block; }
 
     #img {
       width:100vw; height:100vh; object-fit:contain; display:block;
-      transition:opacity .3s ease, transform .6s cubic-bezier(.23,1.2,.32,1);
       pointer-events:none; will-change:transform;
       transform-origin:center center;
+      transform: scale(1);
     }
-    #img.fade { opacity:0; }
+    #img.fade { opacity:0; transition:opacity .3s ease; }
 
-    /* ── DISCO OVERLAY ── */
     #disco {
       position:fixed; inset:0; pointer-events:none; z-index:5;
       opacity:0; mix-blend-mode:screen;
-      transition:opacity .5s ease;
     }
 
-    /* ── HUD ── */
     #hud {
       position:fixed; bottom:max(1.2rem, env(safe-area-inset-bottom, 1.2rem));
       left:50%; transform:translateX(-50%);
@@ -98,7 +89,6 @@
     .dot-f { background:var(--flouf); box-shadow:0 0 5px var(--flouf); }
     .hud-div { width:1px; height:14px; background:var(--border); }
 
-    /* ── TOAST ── */
     #toast {
       position:fixed; top:max(1.5rem, env(safe-area-inset-top, 1.5rem));
       left:50%; transform:translateX(-50%) translateY(-80px);
@@ -111,7 +101,6 @@
     }
     #toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
 
-    /* ── COMPLETION ── */
     #completion {
       display:none; position:fixed; inset:0; z-index:30;
       background:rgba(0,0,0,.88); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
@@ -164,7 +153,6 @@
 </div>
 
 <script>
-// ── DATA ──────────────────────────────────────────────────────
 const IMAGES = [
   "IMG_20250612_131436.jpg","IMG_20250718_174315.jpg","IMG_20251219_090504.jpg",
   "Image10.jpg","Image13.jpg","Image14.jpg","Image15.jpg","Image19.jpg","Image20.jpg",
@@ -190,22 +178,20 @@ const BANNY_IMAGES = new Set([
 const FLOUF_IMAGES = new Set(IMAGES.filter(f => !BANNY_IMAGES.has(f)));
 const BANNY_TOTAL = BANNY_IMAGES.size;
 const FLOUF_TOTAL = FLOUF_IMAGES.size;
-
 const BANNY_NAMES = new Set(["nadir","samy","rym","nora","fatsah","rafik"]);
 const FLOUF_NAMES = new Set(["nelia"]);
 
-// ── MESSAGES D'ENTRÉE ─────────────────────────────────────────
 const ENTRY_MSGS_BANNY = [
   "Bienvenue serviteur de Banny 🐾",
   "Banny t'a choisi. Tu n'avais pas vraiment le choix.",
   "Encore toi ? Banny approve.",
-  "Banny ronronne en ton honneur ",
+  "Banny ronronne en ton honneur 🟠",
   "Serviteur fidèle détecté. Banny est satisfait.",
   "Te juge.jpg",
   "BANNYYYYYYYYYYY",
 ];
 const ENTRY_MSGS_FLOUF = [
-  "Bienvenue serviteur de Flouf 🐾 ",
+  "Bienvenue serviteur de Flouf 🐾",
   "Flouf t'observait depuis le début.",
   "Mugiwara no Fluffyy 🏴‍☠️",
   "Flouf a daigné te laisser entrer.",
@@ -235,19 +221,15 @@ const DISCO_COLORS = [
   "0,255,200","255,255,50","255,0,100","100,255,0"
 ];
 
-// ── STATE ─────────────────────────────────────────────────────
 let saveEnabled=false, userName=null;
 let seenImages=new Set(), seenBanny=new Set(), seenFlouf=new Set();
 let lastIdx=-1;
 const pool = IMAGES.filter(f=>/\.(jpg|jpeg|png|gif|webp|avif|svg)$/i.test(f));
 
-// ── STORAGE ───────────────────────────────────────────────────
 function storageKey(){ return 'cds_'+userName.toLowerCase().trim(); }
 function saveProgress(){
   if(!saveEnabled) return;
-  localStorage.setItem(storageKey(), JSON.stringify({
-    seenImages:[...seenImages], seenBanny:[...seenBanny], seenFlouf:[...seenFlouf]
-  }));
+  localStorage.setItem(storageKey(), JSON.stringify({seenImages:[...seenImages],seenBanny:[...seenBanny],seenFlouf:[...seenFlouf]}));
 }
 function loadProgress(){
   if(!saveEnabled) return;
@@ -258,7 +240,6 @@ function loadProgress(){
   } catch(e){}
 }
 
-// ── WELCOME ───────────────────────────────────────────────────
 const nameInput  = document.getElementById('nameInput');
 const welcomeMsg = document.getElementById('welcomeMsg');
 
@@ -276,93 +257,118 @@ document.getElementById('btnEnter').addEventListener('click', ()=>{
   if(!name){ nameInput.focus(); return; }
   userName=name; saveEnabled=true; loadProgress();
   const v=name.toLowerCase();
-  let pool_msg;
-  if(BANNY_NAMES.has(v))      pool_msg=ENTRY_MSGS_BANNY;
-  else if(FLOUF_NAMES.has(v)) pool_msg=ENTRY_MSGS_FLOUF;
-  else                         pool_msg=ENTRY_MSGS_RANDOM;
-  // Choisir un message différent du dernier pour ce user
-  const lastKey = 'cds_lastmsg_'+v;
-  const last = localStorage.getItem(lastKey)||'';
-  let candidates = pool_msg.filter(m=>m!==last);
+  let pool_msg = BANNY_NAMES.has(v) ? ENTRY_MSGS_BANNY : FLOUF_NAMES.has(v) ? ENTRY_MSGS_FLOUF : ENTRY_MSGS_RANDOM;
+  const lastKey='cds_lastmsg_'+v;
+  const last=localStorage.getItem(lastKey)||'';
+  let candidates=pool_msg.filter(m=>m!==last);
   if(!candidates.length) candidates=pool_msg;
-  const msg = candidates[Math.floor(Math.random()*candidates.length)];
-  if(saveEnabled) localStorage.setItem(lastKey, msg);
+  const msg=candidates[Math.floor(Math.random()*candidates.length)];
+  localStorage.setItem(lastKey, msg);
   startGallery(msg);
 });
 document.getElementById('btnSkip').addEventListener('click', ()=>{
   saveEnabled=false; userName=null;
-  const msg = ENTRY_MSGS_RANDOM[Math.floor(Math.random()*ENTRY_MSGS_RANDOM.length)];
-  startGallery(msg);
+  startGallery(ENTRY_MSGS_RANDOM[Math.floor(Math.random()*ENTRY_MSGS_RANDOM.length)]);
 });
 
-// ── AUDIO + DISCO ─────────────────────────────────────────────
+// ── AUDIO + BEAT ──────────────────────────────────────────────
 let audioCtx=null, analyser=null, dataArray=null;
 let discoRunning=false;
 let lastBeat=0, lastColorIdx=0;
-const disco  = document.getElementById('disco');
+const disco = document.getElementById('disco');
 const imgEl  = document.getElementById('img');
 
-// Beat toutes les ~1s minimum
-const BEAT_COOLDOWN = 950;
-// Durée du pulse : toute la période jusqu'au prochain beat
-let beatInterval = 1000;
-let pulsing = false;
+const BEAT_COOLDOWN = 900;
+const SCALE_BIG  = 1.10;   // zoom max au beat
+const SCALE_SMALL = 1.0;   // retour à la normale
 
-function initAudio(){
-  const audio = new Audio('intro.mp3');
-  audio.loop=true; audio.volume=0.7;
-  audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-  analyser = audioCtx.createAnalyser();
-  analyser.fftSize=256; analyser.smoothingTimeConstant=0.78;
-  const source=audioCtx.createMediaElementSource(audio);
-  source.connect(analyser); analyser.connect(audioCtx.destination);
-  dataArray=new Uint8Array(analyser.frequencyBinCount);
-  audio.play().catch(()=>{});
-  discoRunning=true;
-  discoBeat();
+// On anime scale en JS avec requestAnimationFrame pour avoir un contrôle total
+let currentScale = 1.0;
+let targetScale  = 1.0;
+let animating = false;
+let beatPeriod = 1000; // durée estimée entre deux beats
+let zoomOutTimer = null;
+
+function animateScale(){
+  if(!animating) return;
+  const diff = targetScale - currentScale;
+  if(Math.abs(diff) < 0.0005){
+    currentScale = targetScale;
+    imgEl.style.transform = `scale(${currentScale})`;
+    if(targetScale === SCALE_SMALL) animating = false;
+    return;
+  }
+  // Ease : rapide vers le haut, lent vers le bas
+  const speed = targetScale > currentScale ? 0.18 : 0.03;
+  currentScale += diff * speed;
+  imgEl.style.transform = `scale(${currentScale})`;
+  requestAnimationFrame(animateScale);
 }
 
 function triggerBeat(){
   const now = performance.now();
-  beatInterval = now - lastBeat; // mesure l'intervalle réel
+  if(lastBeat > 0) beatPeriod = now - lastBeat;
   lastBeat = now;
 
-  // Couleur disco
-  lastColorIdx=(lastColorIdx+1+Math.floor(Math.random()*4))%DISCO_COLORS.length;
-  const col=DISCO_COLORS[lastColorIdx];
-  disco.style.background=`rgba(${col},0.28)`;
-  disco.style.opacity='1';
+  // Couleur disco — change à chaque beat, synchronisé
+  lastColorIdx = (lastColorIdx + 1 + Math.floor(Math.random()*3)) % DISCO_COLORS.length;
+  const col = DISCO_COLORS[lastColorIdx];
 
-  // Pulse de l'image : monte vite, reste grand, redescend juste avant le prochain beat
-  imgEl.style.transition='transform 0.12s cubic-bezier(.23,1.2,.32,1)';
-  imgEl.style.transform='scale(1.055)';
+  // Flash immédiat de la couleur
+  disco.style.transition = 'none';
+  disco.style.background = `rgba(${col}, 0.30)`;
+  disco.style.opacity = '1';
 
-  // Vibration mobile
-  if(navigator.vibrate) navigator.vibrate(35);
-
-  // Fade disco après 200ms
-  setTimeout(()=>{ disco.style.opacity='0'; }, 200);
-
-  // Retour à 1 juste avant le prochain beat estimé (80ms avant)
-  const returnDelay = Math.max(beatInterval - 80, 300);
+  // Fade out de la couleur sur ~300ms
   setTimeout(()=>{
-    imgEl.style.transition='transform 0.25s ease-in';
-    imgEl.style.transform='scale(1)';
-  }, returnDelay);
+    disco.style.transition = 'opacity 0.35s ease';
+    disco.style.opacity = '0';
+  }, 20);
+
+  // Zoom IN instantané au beat
+  clearTimeout(zoomOutTimer);
+  targetScale = SCALE_BIG;
+  animating = true;
+  animateScale();
+
+  // Zoom OUT lent — démarre 100ms avant le prochain beat estimé
+  const outDelay = Math.max(beatPeriod * 0.65, 400);
+  zoomOutTimer = setTimeout(()=>{
+    targetScale = SCALE_SMALL;
+    animating = true;
+    animateScale();
+  }, outDelay);
+
+  if(navigator.vibrate) navigator.vibrate(30);
 }
 
 function discoBeat(){
   if(!discoRunning) return;
   requestAnimationFrame(discoBeat);
   analyser.getByteFrequencyData(dataArray);
-  const bassEnd=Math.floor(dataArray.length*0.08);
-  let bassSum=0;
-  for(let i=0;i<bassEnd;i++) bassSum+=dataArray[i];
-  const bassAvg=bassSum/bassEnd;
-  const now=performance.now();
-  if(bassAvg>135 && (now-lastBeat)>BEAT_COOLDOWN){
+  const bassEnd = Math.floor(dataArray.length * 0.07);
+  let bassSum = 0;
+  for(let i=0;i<bassEnd;i++) bassSum += dataArray[i];
+  const bassAvg = bassSum / bassEnd;
+  const now = performance.now();
+  if(bassAvg > 130 && (now - lastBeat) > BEAT_COOLDOWN){
     triggerBeat();
   }
+}
+
+function initAudio(){
+  const audio = new Audio('intro.mp3');
+  audio.loop=true; audio.volume=0.7;
+  audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  analyser = audioCtx.createAnalyser();
+  analyser.fftSize = 256;
+  analyser.smoothingTimeConstant = 0.8;
+  const source = audioCtx.createMediaElementSource(audio);
+  source.connect(analyser); analyser.connect(audioCtx.destination);
+  dataArray = new Uint8Array(analyser.frequencyBinCount);
+  audio.play().catch(()=>{});
+  discoRunning = true;
+  discoBeat();
 }
 
 // ── GALLERY ───────────────────────────────────────────────────
@@ -383,9 +389,16 @@ function pickRandom(){
 
 function showNext(instant){
   const el=document.getElementById('img');
-  if(!instant) el.classList.add('fade');
+  // Reset scale proprement au changement d'image
+  currentScale=1; targetScale=1; animating=false;
+  el.style.transform='scale(1)';
+  if(!instant){
+    el.style.transition='opacity .3s ease';
+    el.classList.add('fade');
+  }
   setTimeout(()=>{
     const file=pool[pickRandom()];
+    el.style.transition='';
     el.src='images/'+file;
     el.onload=()=>{ el.classList.remove('fade'); recordSeen(file); };
   }, instant?0:300);
@@ -427,7 +440,6 @@ function showToast(msg,duration=2000){
   toastTimer=setTimeout(()=>t.classList.remove('show'),duration);
 }
 
-// ── INTERACTIONS ──────────────────────────────────────────────
 document.getElementById('gallery').addEventListener('click',()=>showNext(false));
 let startX,startY;
 document.addEventListener('touchstart',e=>{ startX=e.touches[0].clientX; startY=e.touches[0].clientY; },{passive:true});
